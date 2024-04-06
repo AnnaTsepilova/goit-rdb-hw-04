@@ -1,0 +1,237 @@
+Task 1
+
+a) Назва схеми — “LibraryManagement”
+
+CREATE SCHEMA LibraryManagement;
+
+b) Таблиця "authors":
+
+CREATE TABLE authors (
+    author_id INT AUTO_INCREMENT PRIMARY KEY,
+    author_name VARCHAR(255)
+);
+
+c) Таблиця "genres":
+
+CREATE TABLE genres (
+    genre_id INT AUTO_INCREMENT PRIMARY KEY,
+    genre_name VARCHAR(255)
+);
+
+d) Таблиця "books":
+
+CREATE TABLE books (
+    book_id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255),
+    publication_year YEAR,
+    author_id INT,
+    genre_id INT, 
+    FOREIGN KEY (author_id) REFERENCES authors(author_id),
+    FOREIGN KEY (genre_id) REFERENCES genres(genre_id)
+);
+
+e) Таблиця "users":
+
+CREATE TABLE users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255),
+    email VARCHAR(255)
+
+);
+
+f) Таблиця "borrowed_books":
+
+CREATE TABLE borrowed_books (
+    borrow_id INT AUTO_INCREMENT PRIMARY KEY,
+    book_id INT, 
+    user_id INT,
+    borrow_date DATE,
+    return_date DATE,
+    FOREIGN KEY (book_id) REFERENCES books(book_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+Task 2
+
+INSERT INTO genres (genre_name) VALUES 
+    ('adventure'), 
+    ('detective');
+
+INSERT INTO authors (author_name) VALUES 
+    ('Alexandre Dumas'), 
+    ('Arthur Conan Doyle');
+
+INSERT INTO books (title, publication_year, author_id, genre_id) VALUES 
+    ('The Black Tulip', 1901, 1, 1), 
+    ('A Scandal in Bohemia', 1901, 2, 2);
+
+INSERT INTO users (username, email) VALUES 
+    ('Anna', 'anna@gmail.com'), 
+    ('Kseniia', 'kseniia@gmail.com');
+
+INSERT INTO borrowed_books (book_id, user_id, borrow_date, return_date) VALUES 
+    (1, 1, '2024-01-15', '2024-02-18'), 
+    (2, 2, '2024-02-15', '2024-03-18'),
+    (1, 2, '2024-02-20', '2024-03-30'),
+    (2, 1, '2024-03-30', null);
+
+Task 3
+
+SELECT od.id,
+       od.quantity,
+       orders.id AS order_id,
+       orders.date,
+       customers.id AS customer_id,
+       customers.name,
+       customers.contact,
+       customers.address,
+       customers.city,
+       customers.postal_code,
+       customers.country,
+       products.id AS product_id,
+       products.name,
+       products.unit,
+       products.price,
+       products.supplier_id,
+       products.category_id,
+       categories.name,
+       categories.description,
+       employees.employee_id,
+       employees.last_name,
+       employees.first_name,
+       employees.birthdate,
+       employees.photo,
+       employees.notes,
+       shippers.id AS shippers_id,
+       shippers.name,
+       shippers.phone,
+       suppliers.id AS supplier_id,
+       suppliers.name,
+       suppliers.contact,
+       suppliers.address,
+       suppliers.city,
+       suppliers.postal_code,
+       suppliers.country,
+       suppliers.phone
+FROM order_details AS od
+INNER JOIN orders ON od.order_id = orders.id
+INNER JOIN customers ON orders.customer_id = customers.id
+INNER JOIN products ON od.product_id = products.id
+INNER JOIN categories ON products.category_id = categories.id
+INNER JOIN employees ON orders.employee_id = employees.employee_id
+INNER JOIN shippers ON orders.shipper_id = shippers.id
+INNER JOIN suppliers ON products.supplier_id = suppliers.id
+
+Task 4.1
+
+SELECT COUNT(*) AS total_rows
+       
+FROM order_details AS od
+INNER JOIN orders ON od.order_id = orders.id
+INNER JOIN customers ON orders.customer_id = customers.id
+INNER JOIN products ON od.product_id = products.id
+INNER JOIN categories ON products.category_id = categories.id
+INNER JOIN employees ON orders.employee_id = employees.employee_id
+INNER JOIN shippers ON orders.shipper_id = shippers.id
+INNER JOIN suppliers ON products.supplier_id = suppliers.id
+
+Task 4.2
+
+SELECT COUNT(*) AS total_rows
+       
+FROM order_details AS od
+LEFT JOIN orders ON od.order_id = orders.id
+INNER JOIN customers ON orders.customer_id = customers.id
+INNER JOIN products ON od.product_id = products.id
+LEFT JOIN categories ON products.category_id = categories.id
+INNER JOIN employees ON orders.employee_id = employees.employee_id
+LEFT JOIN shippers ON orders.shipper_id = shippers.id
+INNER JOIN suppliers ON products.supplier_id = suppliers.id
+
+Після зміни у запиті певних INNER JOIN на LEFT JOIN кількість рядків, що повернулися, залишилася незмінною. 
+Це може відбуватися через те, що дані мають повний перетин, тобто для кожного рядка з лівої таблиці є відповідний рядок у правій таблиці. 
+У такому випадку в даній ситуації LEFT JOIN діє аналогічно INNER JOIN, оскільки немає рядків у лівій таблиці, які б не мали відповідностей у правій.
+
+Task 4.3
+
+SELECT employees.employee_id
+       
+FROM order_details AS od
+INNER JOIN orders ON od.order_id = orders.id
+INNER JOIN customers ON orders.customer_id = customers.id
+INNER JOIN products ON od.product_id = products.id
+INNER JOIN categories ON products.category_id = categories.id
+INNER JOIN employees ON orders.employee_id = employees.employee_id
+INNER JOIN shippers ON orders.shipper_id = shippers.id
+INNER JOIN suppliers ON products.supplier_id = suppliers.id
+
+WHERE employees.employee_id > 3 AND employees.employee_id <=10
+
+
+Task 4.4
+
+SELECT categories.name, COUNT(*) as total_rows, AVG(od.quantity) AS avg_quantity
+       
+FROM order_details AS od
+INNER JOIN orders ON od.order_id = orders.id
+INNER JOIN customers ON orders.customer_id = customers.id
+INNER JOIN products ON od.product_id = products.id
+INNER JOIN categories ON products.category_id = categories.id
+INNER JOIN employees ON orders.employee_id = employees.employee_id
+INNER JOIN shippers ON orders.shipper_id = shippers.id
+INNER JOIN suppliers ON products.supplier_id = suppliers.id
+
+GROUP BY categories.name
+
+
+Task 4.5
+
+SELECT categories.name, COUNT(*) as total_rows, AVG(od.quantity) AS avg_quantity
+       
+FROM order_details AS od
+INNER JOIN orders ON od.order_id = orders.id
+INNER JOIN customers ON orders.customer_id = customers.id
+INNER JOIN products ON od.product_id = products.id
+INNER JOIN categories ON products.category_id = categories.id
+INNER JOIN employees ON orders.employee_id = employees.employee_id
+INNER JOIN shippers ON orders.shipper_id = shippers.id
+INNER JOIN suppliers ON products.supplier_id = suppliers.id
+
+GROUP BY categories.name
+HAVING avg_quantity > 21
+
+Task 4.6
+
+SELECT categories.name, COUNT(*) as total_rows, AVG(od.quantity) AS avg_quantity
+       
+FROM order_details AS od
+INNER JOIN orders ON od.order_id = orders.id
+INNER JOIN customers ON orders.customer_id = customers.id
+INNER JOIN products ON od.product_id = products.id
+INNER JOIN categories ON products.category_id = categories.id
+INNER JOIN employees ON orders.employee_id = employees.employee_id
+INNER JOIN shippers ON orders.shipper_id = shippers.id
+INNER JOIN suppliers ON products.supplier_id = suppliers.id
+
+GROUP BY categories.name
+HAVING avg_quantity > 21
+ORDER BY total_rows DESC
+
+Task 4.7
+
+SELECT categories.name, COUNT(*) as total_rows, AVG(od.quantity) AS avg_quantity
+       
+FROM order_details AS od
+INNER JOIN orders ON od.order_id = orders.id
+INNER JOIN customers ON orders.customer_id = customers.id
+INNER JOIN products ON od.product_id = products.id
+INNER JOIN categories ON products.category_id = categories.id
+INNER JOIN employees ON orders.employee_id = employees.employee_id
+INNER JOIN shippers ON orders.shipper_id = shippers.id
+INNER JOIN suppliers ON products.supplier_id = suppliers.id
+
+GROUP BY categories.name
+HAVING avg_quantity > 21
+ORDER BY total_rows DESC
+LIMIT 4
+OFFSET 1
